@@ -1,0 +1,110 @@
+/* General styles */
+body {
+    font-family: 'Arial', sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f4;
+}
+
+/* Container styles */
+.OddsData-container {
+    max-width: 1200px;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+h1 {
+    font-size: 2rem;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+/* List styles */
+ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+/* Game item styling */
+li {
+    margin-bottom: 20px;
+    border-bottom: 1px solid #eaeaea;
+    padding-bottom: 20px;
+}
+
+/* Game header styling */
+li > div {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+li > div > span {
+    font-size: 1.25rem;
+    font-weight: bold;
+    color: #333;
+}
+
+button {
+    padding: 5px 10px;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.875rem;
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+/* Dropdown styles */
+ul ul {
+    margin-top: 10px;
+    padding-left: 20px;
+    background-color: #f9f9f9;
+    border-radius: 5px;
+}
+
+ul ul li {
+    margin-bottom: 10px;
+    font-size: 1rem;
+}
+
+ul ul li strong {
+    color: #007bff;
+}
+
+/* Odds details */
+ul ul div {
+    margin-top: 5px;
+    color: #555;
+    font-size: 0.875rem;
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+    .OddsData-container {
+        padding: 10px;
+    }
+
+    h1 {
+        font-size: 1.75rem;
+    }
+
+    li > div {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    button {
+        width: 100%;
+        margin-top: 10px;
+    }
+}

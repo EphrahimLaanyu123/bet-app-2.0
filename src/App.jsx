@@ -1,9 +1,10 @@
 import './App.css';
 import OddsViewer from './bett/OddsViewer';
+import OddsData from './bett/OddsData'
 function App() {
   return (
     <div className="App">
-      <OddsViewer></OddsViewer>
+      <OddsData></OddsData>
     </div>
   );
 }
