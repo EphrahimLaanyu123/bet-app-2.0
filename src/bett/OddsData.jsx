@@ -1,74 +1,73 @@
 import React, { useState, useEffect } from 'react';
 import Papa from 'papaparse';
-import Bangbet from '../assets/Bangbet - Sheet1.csv';
-import Betika from '../assets/Betika - Sheet1.csv';
-import Betlion from '../assets/Betlion - Sheet1.csv';
-import Odibet from '../assets/Odibet - Sheet1.csv';
-import Sportpesa from '../assets/Sportpesa - Sheet1.csv';
+import CsvUploadModal from './CsvUploadModal';  // Import the modal component
 import './OddsData.css';
 
 const OddsData = () => {
     const [homeGames, setHomeGames] = useState([]);
-    const [selectedGame, setSelectedGame] = useState(null); // to manage the dropdown
-    const csvFiles = [
-        { file: Bangbet, name: 'Bangbet' },
-        { file: Betika, name: 'Betika' },
-        { file: Betlion, name: 'Betlion' },
-        { file: Odibet, name: 'Odibet' },
-        { file: Sportpesa, name: 'Sportpesa' }
-    ];
+    const [selectedGame, setSelectedGame] = useState(null);
+    const [csvFiles, setCsvFiles] = useState([]);
+    const [isModalOpen, setIsModalOpen] = useState(false); // State to manage modal visibility
+
+    // Handle CSV file upload and trigger comparison
+    const handleFileUpload = (files) => {
+        const newCsvFiles = files.map(file => ({
+            file,
+            name: file.name
+        }));
+        setCsvFiles(newCsvFiles);
+        setIsModalOpen(false); // Close modal after file upload
+    };
 
     useEffect(() => {
         const fetchAndParseData = async () => {
             let gamesMap = {};
 
-            // Fetch and parse each CSV
+            // Fetch and parse each CSV (dynamically uploaded files)
             for (let { file, name } of csvFiles) {
-                const response = await fetch(file);
-                const text = await response.text();
+                const reader = new FileReader();
+                reader.onload = async () => {
+                    const text = reader.result;
+                    const parsedData = Papa.parse(text, { header: true, skipEmptyLines: true });
+                    const games = parsedData.data;
 
-                // Parse the CSV data
-                const parsedData = Papa.parse(text, { header: true, skipEmptyLines: true });
-                const games = parsedData.data;
-
-                // Process each game in the CSV
-                games.forEach(game => {
-                    if (game.Home && game.Away && game['1'] && game['x'] && game['2']) {
-                        // Home and Away game with odds
-                        const gameKey = `${game.Home} vs ${game.Away}`;
-                        
-                        // If this home/away game already exists, push the new source and odds
-                        if (gamesMap[gameKey]) {
-                            gamesMap[gameKey].push({
-                                source: name,
-                                homeOdds: game['1'],  // Column '1' for Home odds
-                                drawOdds: game['x'],  // Column 'x' for Draw odds
-                                awayOdds: game['2']   // Column '2' for Away odds
-                            });
-                        } else {
-                            // Otherwise, create a new entry with this game and its source
-                            gamesMap[gameKey] = [{
-                                source: name,
-                                homeOdds: game['1'],
-                                drawOdds: game['x'],
-                                awayOdds: game['2']
-                            }];
+                    // Process each game in the CSV
+                    games.forEach(game => {
+                        if (game.Home && game.Away && game['1'] && game['x'] && game['2']) {
+                            const gameKey = `${game.Home} vs ${game.Away}`;
+                            if (gamesMap[gameKey]) {
+                                gamesMap[gameKey].push({
+                                    source: name,
+                                    homeOdds: game['1'],
+                                    drawOdds: game['x'],
+                                    awayOdds: game['2']
+                                });
+                            } else {
+                                gamesMap[gameKey] = [{
+                                    source: name,
+                                    homeOdds: game['1'],
+                                    drawOdds: game['x'],
+                                    awayOdds: game['2']
+                                }];
+                            }
                         }
-                    }
-                });
+                    });
+
+                    const allGames = Object.keys(gamesMap).map(gameKey => ({
+                        gameKey,
+                        details: gamesMap[gameKey]
+                    }));
+
+                    setHomeGames(allGames);
+                };
+                reader.readAsText(file); // Read the CSV file content
             }
-
-            // Convert the map into a list for display
-            const allGames = Object.keys(gamesMap).map(gameKey => ({
-                gameKey,
-                details: gamesMap[gameKey]
-            }));
-
-            setHomeGames(allGames);
         };
 
-        fetchAndParseData();
-    }, []);
+        if (csvFiles.length > 0) {
+            fetchAndParseData();  // Trigger comparison when files are uploaded
+        }
+    }, [csvFiles]);
 
     // Handle dropdown toggle
     const handleDropdownToggle = (game) => {
@@ -79,9 +78,28 @@ const OddsData = () => {
         }
     };
 
+    // Toggle modal visibility
+    const toggleModal = () => {
+        setIsModalOpen(!isModalOpen);
+    };
+
     return (
         <div>
             <h1>All Games</h1>
+
+            {/* Add CSV Button to open the modal */}
+            <button className="add-csv-btn" onClick={toggleModal}>
+                Add CSV Files
+            </button>
+
+            {/* Modal for uploading CSV files */}
+            <CsvUploadModal 
+                isModalOpen={isModalOpen} 
+                toggleModal={toggleModal} 
+                handleFileUpload={handleFileUpload} 
+            />
+
+            {/* Display all games */}
             <ul>
                 {homeGames.map((game, index) => (
                     <li key={index}>
